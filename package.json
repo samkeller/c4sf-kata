@@ -15,7 +15,8 @@
     "typecheck": "vue-tsc -b",
     "lint": "eslint .",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "test": "vitest run"
   },
   "dependencies": {
     "@primeuix/themes": "^1.2.5",
@@ -40,6 +41,7 @@
     "prettier": "^3.10.1",
     "typescript": "~6.0.3",
     "vite": "^8.2.2",
+    "vitest": "^5.1.1",
     "vue-tsc": "^3.3.11"
   }
 }
