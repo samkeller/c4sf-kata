@@ -6,7 +6,6 @@ import { formatPrice } from '../../utils/format-price.ts'
 import { lineTotal } from '../domain/cart.ts'
 import { useCartStore } from '../state/cart-store.ts'
 
-/** Une ligne du panier, en lecture seule (mini-panier) ou modifiable (page panier). */
 const props = defineProps<{
   line: CartLine
   editable?: boolean

@@ -9,7 +9,7 @@ export function aProduct(overrides: Partial<Product> = {}): Product {
     price: 9.99,
     rating: 2.56,
     image: 'https://cdn.dummyjson.com/mascara.webp',
-    category: 'beauty',
+    category: { slug: 'beauty', name: 'Beauty' },
     ...overrides,
   }
 }

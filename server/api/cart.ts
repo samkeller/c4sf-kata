@@ -1,4 +1,4 @@
-import express, { Router, type NextFunction, type Request, type Response } from 'express'
+import express, { Router } from 'express'
 import { z } from 'zod'
 import { cartSchema } from '#shared/cart.ts'
 import { confirmDummyJsonCart } from '../dummyjson/cart.ts'
@@ -20,7 +20,7 @@ cartRouter.put('/', express.json({ limit: '50kb' }), async (req, res) => {
     return
   }
 
-  // Démo : provoque l'échec d'un panier valide sans dépendre d'une vraie panne de DummyJSON.
+  // Démo rollback, sans dépendre d'une vraie panne de DummyJSON.
   if (req.get('X-Simulate-Failure') === 'true') {
     res.status(503).json({ error: 'Simulated failure' })
     return
@@ -34,16 +34,4 @@ cartRouter.put('/', express.json({ limit: '50kb' }), async (req, res) => {
     console.error(error)
     res.status(502).json({ error: 'Cart confirmation unavailable' })
   }
-})
-
-// Erreurs du parseur JSON (corps illisible : 400, trop gros : 413). Sans ce relais, Express
-// répondrait par sa page d'erreur HTML, avec la stack en dev.
-cartRouter.use((error: unknown, _req: Request, res: Response, next: NextFunction) => {
-  const status =
-    typeof error === 'object' && error !== null && 'status' in error ? error.status : undefined
-  if (typeof status !== 'number' || status >= 500) {
-    next(error)
-    return
-  }
-  res.status(status).json({ error: 'Invalid request body' })
 })

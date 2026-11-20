@@ -4,14 +4,13 @@ import Button from 'primevue/button'
 import Popover from 'primevue/popover'
 import { useCartStore } from '../state/cart-store.ts'
 
-// Chargé à la première ouverture : le mini-panier ne pèse pas sur le premier affichage.
+// Chargé à la première ouverture, pas au premier affichage.
 const CartPreview = defineAsyncComponent(() => import('./CartPreview.vue'))
 
 const cart = useCartStore()
 const popover = useTemplateRef('popover')
 
-// Pas de badge avant la restauration : le serveur ne connaît pas le panier, le badge
-// apparaît après l'hydratation.
+// Pas de badge avant la restauration : le serveur ne connaît pas le panier.
 const badge = computed(() => (cart.restored && cart.count > 0 ? String(cart.count) : undefined))
 </script>
 

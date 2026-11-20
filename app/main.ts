@@ -14,9 +14,7 @@ import { createQueryClient } from './query-client.ts'
 import { createAppRouter } from './router.ts'
 
 interface CreateAppOptions {
-  /** Source des produits, propre à chaque côté (serveur ou navigateur). */
   loadProductList: LoadProductList
-  /** Historique du routeur : mémoire côté serveur, navigateur côté client. */
   history: RouterHistory
 }
 

@@ -1,13 +1,9 @@
 import { z } from 'zod'
-import type { Product } from './product.ts'
+import type { Category, Product } from './product.ts'
 
 export const PAGE_SIZE = 20
 
-/**
- * Critères de la liste produits, lus depuis les query params.
- * Partagé : le serveur valide les requêtes `/api/products` et le client lira les mêmes
- * paramètres dans l'URL, qui reste la source de vérité de la recherche et des filtres.
- */
+/** Partagé : valide les requêtes `/api/products` côté serveur et l'URL côté navigateur. */
 export const productQuerySchema = z
   .object({
     // Une recherche vide équivaut à pas de recherche.
@@ -30,7 +26,16 @@ export const productQuerySchema = z
 
 export type ProductQuery = z.infer<typeof productQuerySchema>
 
-/** Une page de résultats, avec le total des produits qui correspondent aux critères. */
+/** Critères → paramètres d'URL, sans les critères absents ni la page 1 : des URL courtes. */
+export function toProductSearchParams(query: ProductQuery): Record<string, string> {
+  const params: Record<string, string> = {}
+  for (const [key, value] of Object.entries(query)) {
+    if (value !== undefined) params[key] = String(value)
+  }
+  if (query.page === 1) delete params.page
+  return params
+}
+
 export interface ProductPage {
   products: Product[]
   total: number
@@ -41,11 +46,16 @@ export interface ProductPage {
  * Les catégories couvrent tout le catalogue, pas seulement la page.
  */
 export interface ProductListResponse extends ProductPage {
-  categories: string[]
+  categories: Category[]
 }
 
 /**
  * Source de la liste produits fournie à l'app : appel direct au catalogue pendant le rendu
  * serveur, `GET /api/products` dans le navigateur.
+ *
+ * @param signal annule la requête quand des critères plus récents la remplacent.
  */
-export type LoadProductList = (query: ProductQuery) => Promise<ProductListResponse>
+export type LoadProductList = (
+  query: ProductQuery,
+  signal?: AbortSignal,
+) => Promise<ProductListResponse>

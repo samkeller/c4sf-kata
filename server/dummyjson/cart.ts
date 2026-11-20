@@ -6,10 +6,8 @@ import { DUMMYJSON_API_URL, DUMMYJSON_TIMEOUT_MS } from './config.ts'
 const cartUrl = new URL('/carts/1', DUMMYJSON_API_URL)
 
 /**
- * Fait confirmer le panier complet par DummyJSON. Seule la réussite compte : la réponse,
- * recalculée par DummyJSON, n'est pas lue, le panier du navigateur reste la référence.
- *
- * @throws {UpstreamUnavailableError} réseau, timeout ou statut HTTP en erreur.
+ * Fait confirmer le panier par DummyJSON. Seule la réussite compte : sa réponse n'est pas lue,
+ * le panier du navigateur reste la référence.
  */
 export async function confirmDummyJsonCart(cart: Cart): Promise<void> {
   const body = {
@@ -29,8 +27,6 @@ export async function confirmDummyJsonCart(cart: Cart): Promise<void> {
   } catch (error) {
     throw new UpstreamUnavailableError('DummyJSON is unreachable', { cause: error })
   }
-  // Corps non lu : on le libère pour rendre la connexion au pool.
-  await response.body?.cancel()
   if (!response.ok) {
     throw new UpstreamUnavailableError(`DummyJSON responded with HTTP ${response.status}`)
   }

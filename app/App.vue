@@ -17,7 +17,6 @@ import CartPopover from './cart/ui/CartPopover.vue'
     <main class="mx-auto max-w-6xl px-4 py-6">
       <RouterView />
     </main>
-    <!-- Toast global en bas à droite : il ne masque ni le header ni le bouton panier. -->
     <Toast position="bottom-right" />
   </div>
 </template>

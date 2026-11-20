@@ -15,15 +15,10 @@ export function readStoredCart(): Cart {
     const cart = cartSchema.safeParse(JSON.parse(raw))
     return cart.success ? cart.data : emptyCart()
   } catch {
-    // JSON invalide, ou stockage inaccessible (navigation privée, cookies bloqués).
     return emptyCart()
   }
 }
 
 export function writeStoredCart(cart: Cart): void {
-  try {
-    localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cart))
-  } catch {
-    // Quota dépassé ou stockage bloqué : le panier reste utilisable, sans persistance.
-  }
+  localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cart))
 }

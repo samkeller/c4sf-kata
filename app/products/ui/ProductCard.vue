@@ -1,12 +1,15 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import Button from 'primevue/button'
 import Card from 'primevue/card'
 import Rating from 'primevue/rating'
 import Tag from 'primevue/tag'
 import { useToast } from 'primevue/usetoast'
+import { toProductSearchParams } from '#shared/product-list.ts'
 import type { Product } from '#shared/product.ts'
 import { useCartStore } from '../../cart/state/cart-store.ts'
 import { formatPrice } from '../../utils/format-price.ts'
+import { useProductQuery } from '../state/use-product-query.ts'
 
 const props = defineProps<{
   product: Product
@@ -16,9 +19,13 @@ const props = defineProps<{
 
 const cart = useCartStore()
 const toast = useToast()
+const { query } = useProductQuery()
+
+const categoryLink = computed(() => ({
+  query: toProductSearchParams({ ...query.value, category: props.product.category.slug, page: 1 }),
+}))
 
 function addToCart() {
-  // Retour immédiat : le panier est déjà à jour, la confirmation serveur suit en arrière-plan.
   void cart.add(props.product)
   toast.add({
     severity: 'success',
@@ -48,7 +55,9 @@ function addToCart() {
       />
     </template>
     <template #subtitle>
-      <Tag :value="product.category" severity="secondary" class="capitalize" />
+      <RouterLink :to="categoryLink" :aria-label="`Show only ${product.category.name}`">
+        <Tag :value="product.category.name" severity="secondary" class="hover:bg-emphasis" />
+      </RouterLink>
     </template>
     <template #title>
       <h2 class="line-clamp-2 text-base font-semibold">{{ product.title }}</h2>

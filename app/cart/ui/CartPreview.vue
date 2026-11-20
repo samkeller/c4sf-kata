@@ -6,7 +6,6 @@ import CartEmpty from './CartEmpty.vue'
 import CartLineItem from './CartLineItem.vue'
 import CartSummary from './CartSummary.vue'
 
-/** Contenu du mini-panier : aperçu en lecture seule et accès à la page panier. */
 const emit = defineEmits<{ navigate: [] }>()
 
 const cart = useCartStore()

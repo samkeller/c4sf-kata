@@ -22,9 +22,12 @@ const catalogueUrl = new URL('/products', DUMMYJSON_API_URL)
 catalogueUrl.searchParams.set('limit', '0')
 catalogueUrl.searchParams.set('select', Object.keys(dummyJsonProductSchema.shape).join(','))
 
-/**
- * Valide la réponse catalogue de DummyJSON et la convertit en `Product[]`.
- */
+/** Nom d'affichage déduit du slug (`mens-shirts` → `Mens shirts`), sans second appel à l'API. */
+export function dummyJsonCategoryName(slug: string): string {
+  const words = slug.replaceAll('-', ' ')
+  return words.charAt(0).toUpperCase() + words.slice(1)
+}
+
 export function parseDummyJsonCatalogue(body: unknown): Product[] {
   const result = dummyJsonCatalogueSchema.safeParse(body)
   if (!result.success) {
@@ -38,7 +41,7 @@ export function parseDummyJsonCatalogue(body: unknown): Product[] {
     price: product.price,
     rating: product.rating,
     image: product.thumbnail,
-    category: product.category,
+    category: { slug: product.category, name: dummyJsonCategoryName(product.category) },
   }))
 }
 
