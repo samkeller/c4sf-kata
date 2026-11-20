@@ -1,0 +1,24 @@
+{
+  "compilerOptions": {
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.server.tsbuildinfo",
+    "target": "es2024",
+    "lib": ["ES2024"],
+    "types": ["node"],
+    "skipLibCheck": true,
+    "strict": true,
+
+    /* Node exécute le TS directement (type stripping) : seules les syntaxes effaçables sont permises */
+    "module": "nodenext",
+    "allowImportingTsExtensions": true,
+    "verbatimModuleSyntax": true,
+    "erasableSyntaxOnly": true,
+    "noEmit": true,
+
+    /* Linting */
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedIndexedAccess": true
+  },
+  "include": ["server/**/*.ts", "shared/**/*.ts"]
+}
