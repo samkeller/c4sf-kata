@@ -7,6 +7,7 @@ import { toProductSearchParams } from '#shared/product-list.ts'
 import type { Product } from '#shared/product.ts'
 import AddToCartButton from '../../cart/ui/AddToCartButton.vue'
 import { formatPrice } from '../../utils/format-price.ts'
+import { highlightMatches } from '../domain/highlight.ts'
 import { useProductQuery } from '../state/use-product-query.ts'
 
 const props = defineProps<{
@@ -16,6 +17,8 @@ const props = defineProps<{
 }>()
 
 const { query } = useProductQuery()
+
+const titleSegments = computed(() => highlightMatches(props.product.title, query.value.q))
 
 const categoryLink = computed(() => ({
   query: toProductSearchParams({ ...query.value, category: props.product.category.slug, page: 1 }),
@@ -46,7 +49,14 @@ const categoryLink = computed(() => ({
       </RouterLink>
     </template>
     <template #title>
-      <h2 class="line-clamp-2 text-base font-semibold">{{ product.title }}</h2>
+      <h2 class="line-clamp-2 text-base font-semibold">
+        <template v-for="(segment, index) in titleSegments" :key="index">
+          <mark v-if="segment.match" class="rounded-sm bg-primary-100 text-color">{{
+            segment.text
+          }}</mark>
+          <template v-else>{{ segment.text }}</template>
+        </template>
+      </h2>
     </template>
     <template #content>
       <!-- Des <div> et pas de <p> autour de Rating : il rend une <div>, que le navigateur sortirait
