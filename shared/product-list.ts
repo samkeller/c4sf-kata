@@ -35,3 +35,11 @@ export interface ProductPage {
   products: Product[]
   total: number
 }
+
+/**
+ * Réponse de `GET /api/products`, aussi fournie directement au rendu serveur.
+ * Les catégories couvrent tout le catalogue, pas seulement la page.
+ */
+export interface ProductListResponse extends ProductPage {
+  categories: string[]
+}

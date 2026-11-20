@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { productQuerySchema } from './product-query.ts'
+import { productQuerySchema } from './product-list.ts'
 
 describe('productQuerySchema', () => {
   it('defaults to the first page without criteria', () => {
