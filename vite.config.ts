@@ -1,6 +1,7 @@
 import { configDefaults, defineConfig } from 'vitest/config'
 import vue from '@vitejs/plugin-vue'
 import tailwindcss from '@tailwindcss/vite'
+import { visualizer } from 'rollup-plugin-visualizer'
 
 // https://vite.dev/config/
 export default defineConfig(({ isSsrBuild }) => ({
@@ -10,6 +11,8 @@ export default defineConfig(({ isSsrBuild }) => ({
       template: { transformAssetUrls: { includeAbsolute: false } },
     }),
     tailwindcss(),
+    // `npm run analyze` : carte du bundle client dans dist/stats.html.
+    process.env.ANALYZE ? visualizer({ filename: 'dist/stats.html', gzipSize: true }) : null,
   ],
   build: {
     copyPublicDir: !isSsrBuild,
