@@ -12,7 +12,10 @@
     "build:client": "vite build --outDir dist/client",
     "build:server": "vite build --ssr app/entry-server.ts --outDir dist/server",
     "preview": "cross-env NODE_ENV=production node server/server.ts",
-    "typecheck": "vue-tsc -b"
+    "typecheck": "vue-tsc -b",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
   },
   "dependencies": {
     "compression": "^1.8.1",
@@ -25,8 +28,14 @@
     "@types/express": "^5.0.6",
     "@types/node": "^26.5.0",
     "@vitejs/plugin-vue": "^6.0.8",
+    "@vue/eslint-config-prettier": "^10.2.0",
+    "@vue/eslint-config-typescript": "^14.9.0",
     "@vue/tsconfig": "^0.9.1",
     "cross-env": "^10.1.0",
+    "eslint": "^10.15.0",
+    "eslint-plugin-vue": "^10.12.1",
+    "jiti": "^2.7.0",
+    "prettier": "^3.10.1",
     "typescript": "~6.0.3",
     "vite": "^8.2.2",
     "vue-tsc": "^3.3.11"
