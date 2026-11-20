@@ -105,7 +105,16 @@ Details and trade-offs: [`docs/technical-choices.md`](docs/technical-choices.md)
 - **Serve stale data** when DummyJSON fails, rather than an error.
 
 ## Working with AI agents
+### Using AI agents
+I did this project using AI agents to assist with various tasks, following the conventions and architecture rules outlined in the documentation.
 
+- **Planning and coordination.** - I tried to use the [mattpocock wayfinder skill](https://github.com/mattpocock/skills/blob/main/skills/engineering/wayfinder/SKILL.md) with various levels of success. The skill helps in breaking down tasks, drafting as structured plan and answering the first conception and design questions in an llm/human dialog. The skill seems really made for fully autonomous agents, not human code.
+    Majority of this work and results can be found in [the issues](https://github.com/samkeller/c4sf-kata/issues?q=is%3Aissue) of the repository.
+    I really liked working branch-by-branch with the slices he created ! Will probably continue using this approach in future projects.
+- I then used the agents to assist with coding tasks, following the conventions and architecture rules specified in [`AGENTS.md`](AGENTS.md). The agents helped in structuring the code, verifying adherence to the rules, and providing suggestions for improvements. They were mostly helpfull to me for the vue 3 code since I worked most on vue 2 code.
+
+
+### References
 - [`AGENTS.md`](AGENTS.md): conventions, architecture rules and verification steps for coding agents.
 - [`docs/CONTEXT.md`](docs/CONTEXT.md): the domain vocabulary.
 - `.mcp.json`: PrimeVue documentation server.
