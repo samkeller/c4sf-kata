@@ -4,6 +4,7 @@ import helmet from 'helmet'
 import type { ViteDevServer } from 'vite'
 import type { LoadProductList } from '#shared/product-list.ts'
 import type { RenderFn } from '#shared/ssr.ts'
+import { cartRouter } from './api/cart.ts'
 import { productsRouter } from './api/products.ts'
 import { getProductList } from './catalogue/catalogue.ts'
 import { DUMMYJSON_IMAGE_ORIGIN } from './dummyjson/config.ts'
@@ -49,6 +50,7 @@ if (!isProduction) {
 
 // Après `compression()` -> Avant le rendu SSR.
 app.use('/api/products', productsRouter)
+app.use('/api/cart', cartRouter)
 
 /**
  * En dev, Vite charge `entry-server.ts` à chaque requête pour profiter du HMR.
@@ -87,7 +89,8 @@ async function loadTemplate(url: string): Promise<string> {
 
 app.use('*all', async (req, res) => {
   try {
-    const url = req.originalUrl.replace(base, '')
+    // URL complète : le routeur a besoin du chemin absolu (`/cart`, pas `cart`).
+    const url = req.originalUrl
     const [template, render] = await Promise.all([loadTemplate(url), loadRender()])
     const rendered = await render(url, { loadProductList: loadProductListForRender })
 

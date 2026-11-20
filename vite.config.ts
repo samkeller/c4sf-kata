@@ -16,5 +16,7 @@ export default defineConfig(({ isSsrBuild }) => ({
   },
   test: {
     environment: 'node',
+    // Restaure fetch, localStorage… après chaque test : un stub ne fuit jamais dans le suivant.
+    unstubGlobals: true,
   },
 }))

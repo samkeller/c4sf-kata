@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { UpstreamDataError, UpstreamUnavailableError } from '../errors.ts'
 import { fetchDummyJsonCatalogue, parseDummyJsonCatalogue } from './catalogue.ts'
 
@@ -69,10 +69,6 @@ describe('parseDummyJsonCatalogue', () => {
 })
 
 describe('fetchDummyJsonCatalogue', () => {
-  afterEach(() => {
-    vi.unstubAllGlobals()
-  })
-
   it('returns the mapped catalogue', async () => {
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue(Response.json({ products: [mascara] })))
 
