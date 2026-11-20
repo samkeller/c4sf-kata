@@ -44,6 +44,8 @@ Work is done when this chain is green, which is also what CI runs:
 npm run typecheck && npm run lint && npm run format:check && npm test && npm run build
 ```
 
+Before opening a pull request, also run `npm run test:e2e` (once: `npx playwright install chromium`). It is not in CI because it calls the real DummyJSON.
+
 After a change that touches rendering, also run `npm run dev` (http://localhost:5176):
 
 - the markup shows in view-source;
