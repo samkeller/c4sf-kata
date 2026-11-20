@@ -43,3 +43,9 @@ export interface ProductPage {
 export interface ProductListResponse extends ProductPage {
   categories: string[]
 }
+
+/**
+ * Source de la liste produits fournie à l'app : appel direct au catalogue pendant le rendu
+ * serveur, `GET /api/products` dans le navigateur.
+ */
+export type LoadProductList = (query: ProductQuery) => Promise<ProductListResponse>
