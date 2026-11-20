@@ -1,13 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import { cartSchema, type CartLine } from './cart.ts'
+import { aCartLine } from './test-fixtures.ts'
 
-const line: CartLine = {
-  productId: 1,
-  quantity: 2,
-  title: 'Essence Mascara Lash Princess',
-  unitPrice: 9.99,
-  image: 'https://cdn.dummyjson.com/mascara.webp',
-}
+const line = aCartLine()
 
 describe('cartSchema', () => {
   it('accepts a valid cart, empty or not', () => {

@@ -24,26 +24,7 @@ Set `PORT` to use another port.
 
 ## API
 
-`GET /api/products` returns one page of products, the number of matching products and the list of categories:
-
-```json
-{
-  "products": [
-    { "id": 1, "title": "…", "price": 9.99, "rating": 4.5, "image": "…", "category": "beauty" }
-  ],
-  "total": 194,
-  "categories": ["beauty", "…"]
-}
-```
-
-| Parameter              | Effect                                         |
-| ---------------------- | ---------------------------------------------- |
-| `q`                    | Search in product titles                       |
-| `category`             | Keep one category                              |
-| `minPrice`, `maxPrice` | Price range, bounds included                   |
-| `page`                 | Page number, 20 products per page, starts at 1 |
-
-Invalid parameters return `400`. If DummyJSON is unreachable or returns invalid data, the route returns `502`.
+`GET /api/products` (catalogue) and `PUT /api/cart` (cart confirmation): see [`docs/API.md`](docs/API.md).
 
 ## Quality checks
 
@@ -76,22 +57,15 @@ UI components never call `api/` directly; ESLint enforces this.
 
 ## Technical choices
 
-- **Server-side rendering with Vite, no meta-framework.** Product HTML is in the first response, without waiting for JavaScript. Client-side rendering and static generation were rejected ([#5](https://github.com/samkeller/c4sf-kata/issues/5)).
-- **TypeScript everywhere.** The server runs as TypeScript directly on Node 24, so it needs no separate build.
-- **PrimeVue 4 with the Aura preset.** A ready-made component library keeps time on features rather than CSS ([#9](https://github.com/samkeller/c4sf-kata/issues/9)).
-  - Version 4 because it is MIT; version 5 requires a commercial licence key.
-  - Component styles are inlined in the server-rendered HTML, so the page does not flash unstyled before hydration.
-- **TanStack Vue Query for data, prefetched during server rendering** ([#6](https://github.com/samkeller/c4sf-kata/issues/6)).
-  - Each request gets its own query client. The server calls the catalogue directly instead of its own HTTP API; the browser calls `/api/products`.
-  - The query cache, errors included, is serialised into a `<script type="application/json">` and restored before the app mounts, so the page does not fetch again.
-  - Data stays fresh for 5 minutes and cached for 30. The browser retries twice on network errors and 5xx, 408 or 429 responses; the server does not retry, so a failing API cannot delay the HTML.
-- **The server filters an in-memory catalogue.** DummyJSON has no price filter, and its search ignores categories. So the server loads the whole trimmed catalogue in one call, keeps it for 5 minutes, and applies search, category, price and pagination itself ([#8](https://github.com/samkeller/c4sf-kata/issues/8)).
-  - This assumes a small catalogue: DummyJSON has 194 products. A real catalogue would move this work to a search engine or to the API.
-  - Concurrent requests share one upstream call, and a failed call is not cached.
-- **Upstream data is validated.** DummyJSON responses are checked with Zod and mapped to our own `Product` type. One invalid product rejects the whole response, with an explicit error, rather than showing a partial catalogue.
-- **Vitest, ESLint and Prettier**, with CI as the safety net.
+- **Hand-rolled Vite SSR, no meta-framework**: product HTML is in the first response.
+- **TanStack Vue Query**, prefetched on the server and hydrated in the browser: no second fetch.
+- **The cart lives in the browser**: optimistic updates, rollback on failure, `localStorage`, synced across tabs.
+- **The server filters an in-memory catalogue**: fine for DummyJSON's 194 products.
+- **Zod at every boundary**: upstream API, request bodies, `localStorage`.
+- **PrimeVue 4 (MIT) and Tailwind**: ready-made components, no custom CSS.
+- **Vitest, ESLint, Prettier and CI.**
 
-All decisions, with the alternatives considered, are recorded in [issue #1](https://github.com/samkeller/c4sf-kata/issues/1).
+Details and trade-offs: [`docs/technical-choices.md`](docs/technical-choices.md). Decisions and rejected alternatives: [issue #1](https://github.com/samkeller/c4sf-kata/issues/1).
 
 ## Working with AI agents
 

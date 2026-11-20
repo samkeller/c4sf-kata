@@ -1,24 +1,21 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { createPinia, setActivePinia } from 'pinia'
-import type { Product } from '#shared/product.ts'
+import { aCartLine, aProduct } from '#shared/test-fixtures.ts'
 import { readStoredCart, writeStoredCart } from '../api/cart-storage.ts'
 import { saveCart } from '../api/save-cart.ts'
 import { useCartStore } from './cart-store.ts'
 
 vi.mock('../api/save-cart.ts', () => ({ saveCart: vi.fn() }))
-vi.mock('../api/cart-storage.ts', () => ({ readStoredCart: vi.fn(), writeStoredCart: vi.fn() }))
+vi.mock('../api/cart-storage.ts', () => ({
+  CART_STORAGE_KEY: 'cart:v1',
+  readStoredCart: vi.fn(),
+  writeStoredCart: vi.fn(),
+}))
 const toastAdd = vi.fn()
 vi.mock('primevue/usetoast', () => ({ useToast: () => ({ add: toastAdd }) }))
 
-const mascara: Product = {
-  id: 1,
-  title: 'Essence Mascara Lash Princess',
-  price: 9.99,
-  rating: 2.56,
-  image: 'https://cdn.dummyjson.com/mascara.webp',
-  category: 'beauty',
-}
-const lipstick: Product = { ...mascara, id: 4, title: 'Red Lipstick', price: 12.99 }
+const mascara = aProduct()
+const lipstick = aProduct({ id: 4, title: 'Red Lipstick', price: 12.99 })
 
 /** Réponse serveur pilotée par le test, pour choisir l'ordre et l'issue des confirmations. */
 function deferred() {
@@ -36,6 +33,8 @@ describe('cart store', () => {
     setActivePinia(createPinia())
     vi.clearAllMocks()
     vi.mocked(readStoredCart).mockReturnValue({ lines: [] })
+    // Les écouteurs du store (synchro entre onglets) s'attachent à window.
+    vi.stubGlobal('window', new EventTarget())
   })
 
   it('shows a change immediately and saves it locally, before the server answers', () => {
@@ -109,11 +108,7 @@ describe('cart store', () => {
   })
 
   it('restores the stored cart and treats it as confirmed', async () => {
-    vi.mocked(readStoredCart).mockReturnValue({
-      lines: [
-        { productId: 1, quantity: 2, title: 'Mascara', unitPrice: 9.99, image: mascara.image },
-      ],
-    })
+    vi.mocked(readStoredCart).mockReturnValue({ lines: [aCartLine({ quantity: 2 })] })
     const cart = useCartStore()
 
     cart.restore()
@@ -123,5 +118,48 @@ describe('cart store', () => {
     vi.mocked(saveCart).mockRejectedValueOnce(new Error('HTTP 503'))
     await cart.remove(1)
     expect(cart.count).toBe(2)
+  })
+
+  describe('across tabs', () => {
+    function storageEvent(key: string | null) {
+      return Object.assign(new Event('storage'), { key })
+    }
+
+    it('takes the cart another tab saved', () => {
+      const cart = useCartStore()
+      cart.restore()
+
+      vi.mocked(readStoredCart).mockReturnValue({ lines: [aCartLine({ quantity: 5 })] })
+      window.dispatchEvent(storageEvent('cart:v1'))
+
+      expect(cart.count).toBe(5)
+    })
+
+    it('ignores the other keys of the storage', () => {
+      const cart = useCartStore()
+      cart.restore()
+
+      vi.mocked(readStoredCart).mockReturnValue({ lines: [aCartLine({ quantity: 5 })] })
+      window.dispatchEvent(storageEvent('theme'))
+
+      expect(cart.count).toBe(0)
+    })
+
+    it('lets the other tab win over a change still waiting for the server', async () => {
+      const pending = deferred()
+      vi.mocked(saveCart).mockReturnValueOnce(pending.promise)
+      const cart = useCartStore()
+      cart.restore()
+      const adding = cart.add(mascara)
+
+      vi.mocked(readStoredCart).mockReturnValue({ lines: [aCartLine({ quantity: 5 })] })
+      window.dispatchEvent(storageEvent('cart:v1'))
+      pending.reject(new Error('HTTP 503'))
+      await adding
+
+      expect(cart.count).toBe(5)
+      expect(cart.status).toBe('idle')
+      expect(toastAdd).not.toHaveBeenCalled()
+    })
   })
 })

@@ -1,25 +1,12 @@
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import type { Cart } from '#shared/cart.ts'
+import { aCartLine } from '#shared/test-fixtures.ts'
 import { UpstreamUnavailableError } from '../errors.ts'
 import { confirmDummyJsonCart } from './cart.ts'
 
-const cart: Cart = {
-  lines: [
-    {
-      productId: 1,
-      quantity: 2,
-      title: 'Essence Mascara Lash Princess',
-      unitPrice: 9.99,
-      image: 'https://cdn.dummyjson.com/mascara.webp',
-    },
-  ],
-}
+const cart: Cart = { lines: [aCartLine()] }
 
 describe('confirmDummyJsonCart', () => {
-  afterEach(() => {
-    vi.unstubAllGlobals()
-  })
-
   it('replaces the DummyJSON cart with our product ids and quantities', async () => {
     const fetchMock = vi.fn().mockResolvedValue(Response.json({ id: 1 }))
     vi.stubGlobal('fetch', fetchMock)

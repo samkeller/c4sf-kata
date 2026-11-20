@@ -1,18 +1,11 @@
 import { describe, expect, it } from 'vitest'
 import type { Product } from '#shared/product.ts'
+import { aProduct } from '#shared/test-fixtures.ts'
 import { PAGE_SIZE, type ProductQuery } from '#shared/product-list.ts'
 import { listCategories, queryProducts } from './query-products.ts'
 
 function product(id: number, overrides: Partial<Product> = {}): Product {
-  return {
-    id,
-    title: `Product ${id}`,
-    price: id,
-    rating: 4,
-    image: `https://cdn.dummyjson.com/${id}.webp`,
-    category: 'misc',
-    ...overrides,
-  }
+  return aProduct({ id, title: `Product ${id}`, price: id, category: 'misc', ...overrides })
 }
 
 function query(criteria: Partial<ProductQuery> = {}): ProductQuery {

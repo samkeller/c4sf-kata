@@ -1,17 +1,10 @@
 import { describe, expect, it } from 'vitest'
 import type { Cart } from '#shared/cart.ts'
-import type { Product } from '#shared/product.ts'
+import { aProduct } from '#shared/test-fixtures.ts'
 import { addProduct, cartTotal, itemCount, lineTotal, removeLine, setQuantity } from './cart.ts'
 
-const mascara: Product = {
-  id: 1,
-  title: 'Essence Mascara Lash Princess',
-  price: 9.99,
-  rating: 2.56,
-  image: 'https://cdn.dummyjson.com/mascara.webp',
-  category: 'beauty',
-}
-const lipstick: Product = { ...mascara, id: 4, title: 'Red Lipstick', price: 12.99 }
+const mascara = aProduct()
+const lipstick = aProduct({ id: 4, title: 'Red Lipstick', price: 12.99 })
 
 const empty: Cart = { lines: [] }
 

@@ -1,19 +1,11 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import type { Product } from '#shared/product.ts'
+import { aProduct } from '#shared/test-fixtures.ts'
 import { createCatalogueCache } from './catalogue-cache.ts'
 
 const TTL_MS = 5 * 60 * 1000
 
-const catalogue: Product[] = [
-  {
-    id: 1,
-    title: 'Mascara',
-    price: 9.99,
-    rating: 4,
-    image: 'https://x/1.webp',
-    category: 'beauty',
-  },
-]
+const catalogue: Product[] = [aProduct()]
 
 describe('createCatalogueCache', () => {
   beforeEach(() => {

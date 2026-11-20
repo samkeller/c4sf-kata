@@ -3,7 +3,7 @@ import { defineStore } from 'pinia'
 import { useToast } from 'primevue/usetoast'
 import type { Cart } from '#shared/cart.ts'
 import type { Product } from '#shared/product.ts'
-import { readStoredCart, writeStoredCart } from '../api/cart-storage.ts'
+import { CART_STORAGE_KEY, readStoredCart, writeStoredCart } from '../api/cart-storage.ts'
 import { saveCart } from '../api/save-cart.ts'
 import {
   addProduct,
@@ -68,16 +68,32 @@ export const useCartStore = defineStore('cart', () => {
     }
   }
 
-  /**
-   * Restaure le panier depuis `localStorage`. Navigateur uniquement, après l'hydratation :
-   * le serveur ne voit pas ce stockage, et le premier rendu client doit égaler le HTML serveur.
-   */
-  function restore(): void {
+  /** Reprend le panier sauvegardé comme état courant et confirmé. */
+  function loadStoredCart(): void {
     const stored = readStoredCart()
     cart.value = stored
     // Le navigateur est la source de vérité : ce qu'il a gardé fait référence.
     confirmed = stored
+  }
+
+  /**
+   * Restaure le panier depuis `localStorage`, puis suit les changements faits dans les autres
+   * onglets. Navigateur uniquement, après l'hydratation : le serveur ne voit pas ce stockage,
+   * et le premier rendu client doit égaler le HTML serveur.
+   */
+  function restore(): void {
+    loadStoredCart()
     restored.value = true
+
+    // `storage` n'est émis que dans les autres onglets. La dernière écriture l'emporte : un
+    // changement d'ailleurs remplace celui en cours ici, dont la réponse sera donc ignorée.
+    // `key` vaut null quand le stockage est vidé en entier.
+    window.addEventListener('storage', (event) => {
+      if (event.key !== null && event.key !== CART_STORAGE_KEY) return
+      latestRequest++
+      loadStoredCart()
+      status.value = 'idle'
+    })
   }
 
   return {

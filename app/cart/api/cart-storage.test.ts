@@ -1,18 +1,9 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { Cart } from '#shared/cart.ts'
+import { aCartLine } from '#shared/test-fixtures.ts'
 import { CART_STORAGE_KEY, readStoredCart, writeStoredCart } from './cart-storage.ts'
 
-const cart: Cart = {
-  lines: [
-    {
-      productId: 1,
-      quantity: 2,
-      title: 'Essence Mascara Lash Princess',
-      unitPrice: 9.99,
-      image: 'https://cdn.dummyjson.com/mascara.webp',
-    },
-  ],
-}
+const cart: Cart = { lines: [aCartLine()] }
 
 function memoryStorage(): Storage {
   const items = new Map<string, string>()
@@ -46,7 +37,7 @@ describe('cart storage', () => {
   it.each([
     ['invalid JSON', '{not json'],
     ['another format', JSON.stringify([{ id: 1, qty: 2 }])],
-    ['an invalid quantity', JSON.stringify({ lines: [{ ...cart.lines[0], quantity: -1 }] })],
+    ['an invalid quantity', JSON.stringify({ lines: [aCartLine({ quantity: -1 })] })],
   ])('gives an empty cart for %s', (_case, raw) => {
     localStorage.setItem(CART_STORAGE_KEY, raw)
 
