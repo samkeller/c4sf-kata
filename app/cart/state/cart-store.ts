@@ -29,6 +29,7 @@ export const useCartStore = defineStore('cart', () => {
   const restored = ref(false)
   const simulateFailure = ref(false)
   let latestRequest = 0
+  let leavingPage = false
 
   const lines = computed(() => cart.value.lines)
   const count = computed(() => itemCount(cart.value))
@@ -53,7 +54,9 @@ export const useCartStore = defineStore('cart', () => {
       confirmed = next
       status.value = 'idle'
     } catch {
-      if (request !== latestRequest) return
+      // Quitter ou recharger la page annule la requête : ce n'est pas un refus du serveur,
+      // et un rollback effacerait de localStorage le changement qu'on vient de faire.
+      if (request !== latestRequest || leavingPage) return
       cart.value = confirmed
       // Le rollback est sauvegardé aussi : sinon un rechargement ferait revenir le changement refusé.
       writeStoredCart(confirmed)
@@ -89,6 +92,11 @@ export const useCartStore = defineStore('cart', () => {
       loadStoredCart()
       status.value = 'idle'
     })
+    // `beforeunload` part avant l'annulation des requêtes ; `pagehide` couvre Safari mobile.
+    window.addEventListener('beforeunload', () => (leavingPage = true))
+    window.addEventListener('pagehide', () => (leavingPage = true))
+    // Page ressortie du cache précédent / suivant : elle vit de nouveau.
+    window.addEventListener('pageshow', () => (leavingPage = false))
   }
 
   return {

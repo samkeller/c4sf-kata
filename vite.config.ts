@@ -1,4 +1,4 @@
-import { defineConfig } from 'vitest/config'
+import { configDefaults, defineConfig } from 'vitest/config'
 import vue from '@vitejs/plugin-vue'
 import tailwindcss from '@tailwindcss/vite'
 
@@ -16,6 +16,8 @@ export default defineConfig(({ isSsrBuild }) => ({
   },
   test: {
     environment: 'node',
+    // Les parcours E2E tournent avec Playwright (`npm run test:e2e`), pas avec Vitest.
+    exclude: [...configDefaults.exclude, 'e2e/**'],
     // Restaure fetch, localStorage… après chaque test : un stub ne fuit jamais dans le suivant.
     unstubGlobals: true,
   },

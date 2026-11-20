@@ -120,6 +120,24 @@ describe('cart store', () => {
     expect(cart.count).toBe(2)
   })
 
+  it('keeps the change when the request fails because the page is being left', async () => {
+    const pending = deferred()
+    vi.mocked(saveCart).mockReturnValueOnce(pending.promise)
+    const cart = useCartStore()
+    cart.restore()
+    const adding = cart.add(mascara)
+
+    window.dispatchEvent(new Event('pagehide'))
+    pending.reject(new TypeError('Failed to fetch'))
+    await adding
+
+    expect(cart.count).toBe(1)
+    expect(writeStoredCart).toHaveBeenLastCalledWith({
+      lines: [expect.objectContaining({ productId: 1 })],
+    })
+    expect(toastAdd).not.toHaveBeenCalled()
+  })
+
   describe('across tabs', () => {
     function storageEvent(key: string | null) {
       return Object.assign(new Event('storage'), { key })
