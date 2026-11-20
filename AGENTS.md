@@ -9,7 +9,7 @@ E-shop product gallery with a cart: Vue 3 server-side rendering on Express, no m
 
 - `app/`: the Vue app, rendered on the server and hydrated in the browser. `main.ts` creates the app; `entry-server.ts` and `entry-client.ts` are the two entries.
 - `server/`: Express. Handles SSR, upstream API access and `/api/*`. Node 24 runs this TypeScript directly (type stripping), so use erasable syntax only and end relative imports in `.ts`.
-- `shared/`: code imported by both `app/` and `server/`.
+- `shared/`: code imported by both `app/` and `server/`. Import it as `#shared/<file>.ts`, a Node subpath import declared in `package.json` that Node, Vite and TypeScript resolve without extra config.
 
 Features live in `app/<feature>/` and follow simple MVC:
 
@@ -27,7 +27,6 @@ Create a sub-folder when its first file arrives.
 - **Proportion:** add an abstraction or a dependency when a current requirement needs it.
 - **Tests:** Vitest, colocated as `*.test.ts`. Target behaviour (business rules, mappers, URL-state parsing), not coverage.
 - **Comments** are in French and explain why. JSDoc is for non-obvious contracts.
-- **Commits** follow Conventional Commits, one coherent change each.
 
 ## UI: PrimeVue 4
 

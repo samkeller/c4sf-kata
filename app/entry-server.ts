@@ -1,6 +1,7 @@
 import { renderToString } from 'vue/server-renderer'
 import BaseStyle from '@primevue/core/base/style'
-import type { RenderFn } from '../shared/ssr.ts'
+import { dehydrate, defaultShouldDehydrateQuery, type DehydratedState } from '@tanstack/vue-query'
+import type { RenderFn } from '#shared/ssr.ts'
 import { createApp } from './main.ts'
 
 /** Méthodes des objets de style PrimeVue utilisées ici (absentes de leurs typages publics). */
@@ -9,6 +10,7 @@ interface PrimeVueStyle {
   getStyleSheet: () => string | undefined
   getThemeStyleSheet: () => string | undefined
   getCommonThemeStyleSheet: () => string | undefined
+  getLayerOrderThemeCSS: () => string
 }
 
 function isPrimeVueStyle(value: unknown): value is PrimeVueStyle {
@@ -18,7 +20,8 @@ function isPrimeVueStyle(value: unknown): value is PrimeVueStyle {
     'name' in value &&
     'getStyleSheet' in value &&
     'getThemeStyleSheet' in value &&
-    'getCommonThemeStyleSheet' in value
+    'getCommonThemeStyleSheet' in value &&
+    'getLayerOrderThemeCSS' in value
   )
 }
 
@@ -30,6 +33,10 @@ function isPrimeVueStyle(value: unknown): value is PrimeVueStyle {
 function renderPrimeVueStyles(styles: ReadonlySet<PrimeVueStyle>): string {
   if (styles.size === 0 || !isPrimeVueStyle(BaseStyle)) return ''
   return [
+    // L'ordre des couches doit précéder toute autre déclaration `@layer`, y compris celles du
+    // CSS Tailwind chargé ensuite. Sinon la couche `primevue` deviendrait la moins prioritaire
+    // et le preflight Tailwind écraserait les composants jusqu'à l'hydratation.
+    `<style type="text/css" data-primevue-style-id="layer-order">${BaseStyle.getLayerOrderThemeCSS()}</style>`,
     BaseStyle.getStyleSheet(),
     BaseStyle.getCommonThemeStyleSheet(),
     BaseStyle.getThemeStyleSheet(),
@@ -37,8 +44,17 @@ function renderPrimeVueStyles(styles: ReadonlySet<PrimeVueStyle>): string {
   ].join('')
 }
 
-export const render: RenderFn = async () => {
-  const { app } = createApp()
+/**
+ * Sérialise le cache pour un `<script type="application/json">`. Ce bloc n'est pas exécuté,
+ * donc compatible avec la CSP `script-src 'self'`. Les `<` sont échappés : la query key et
+ * les titres viennent de l'extérieur, et un `</script>` fermerait la balise (XSS).
+ */
+function serializeState(state: DehydratedState): string {
+  return JSON.stringify(state).replaceAll('<', '\\u003c')
+}
+
+export const render: RenderFn = async (_url, { loadProductList }) => {
+  const { app, queryClient } = createApp(loadProductList)
 
   // PrimeVue injecte son CSS dans `beforeMount`, qui ne s'exécute pas côté serveur.
   // On relève donc les styles des composants rendus pour les mettre dans le <head>,
@@ -52,5 +68,15 @@ export const render: RenderFn = async () => {
   })
 
   const html = await renderToString(app)
-  return { html, head: renderPrimeVueStyles(usedStyles) }
+
+  const state = dehydrate(queryClient, {
+    // Une requête en échec est rendue en état d'erreur : il faut la transmettre aussi,
+    // sinon le client démarrerait en chargement et l'hydratation ne correspondrait pas.
+    shouldDehydrateQuery: (query) =>
+      defaultShouldDehydrateQuery(query) || query.state.status === 'error',
+  })
+  // Le gcTime arme un timer par requête : sans ça, ce client resterait en mémoire 30 min.
+  queryClient.clear()
+
+  return { html, head: renderPrimeVueStyles(usedStyles), state: serializeState(state) }
 }

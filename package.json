@@ -3,6 +3,9 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "imports": {
+    "#shared/*": "./shared/*"
+  },
   "engines": {
     "node": ">=24"
   },
@@ -20,6 +23,7 @@
   },
   "dependencies": {
     "@primeuix/themes": "^1.2.5",
+    "@tanstack/vue-query": "^5.108.2",
     "compression": "^1.8.1",
     "express": "^5.2.1",
     "helmet": "^8.3.0",
@@ -29,6 +33,7 @@
     "zod": "^4.6.7"
   },
   "devDependencies": {
+    "@tailwindcss/vite": "^4.3.5",
     "@types/compression": "^1.8.1",
     "@types/express": "^5.0.6",
     "@types/node": "^26.5.0",
@@ -41,6 +46,8 @@
     "eslint-plugin-vue": "^10.12.1",
     "jiti": "^2.7.0",
     "prettier": "^3.10.1",
+    "tailwindcss": "^4.3.5",
+    "tailwindcss-primeui": "^0.6.1",
     "typescript": "~6.0.3",
     "vite": "^8.2.2",
     "vitest": "^5.1.1",
