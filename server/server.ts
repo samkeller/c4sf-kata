@@ -16,6 +16,10 @@ const base = process.env.BASE ?? '/'
 // En production, le template est figé au build : on le lit une seule fois au démarrage.
 const templateHtml = isProduction ? await fs.readFile('./dist/client/index.html', 'utf-8') : ''
 
+// Ouvre la connexion au CDN des images pendant que le HTML arrive. L'origine vient de la
+// config DummyJSON, comme pour la CSP.
+const imagePreconnect = `<link rel="preconnect" href="${DUMMYJSON_IMAGE_ORIGIN}" />`
+
 const app = express()
 
 app.use(
@@ -97,7 +101,7 @@ app.use('*all', async (req, res) => {
     // Remplacements par fonction : avec une chaîne, `replace` interpréterait les `$&`, `$'`…
     // présents dans le contenu (un titre de produit, par exemple).
     const html = template
-      .replace('<!--app-head-->', () => rendered.head)
+      .replace('<!--app-head-->', () => imagePreconnect + rendered.head)
       .replace('<!--app-html-->', () => rendered.html)
       .replace('<!--app-state-->', () => rendered.state)
 

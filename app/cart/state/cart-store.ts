@@ -8,10 +8,12 @@ import { saveCart } from '../api/save-cart.ts'
 import {
   addProduct,
   cartTotal,
+  decrementProduct,
   emptyCart,
+  incrementProduct,
   itemCount,
+  quantityOf,
   removeLine,
-  setQuantity as setLineQuantity,
 } from '../domain/cart.ts'
 
 export type CartStatus = 'idle' | 'syncing' | 'error'
@@ -19,15 +21,12 @@ export type CartStatus = 'idle' | 'syncing' | 'error'
 export const useCartStore = defineStore('cart', () => {
   const toast = useToast()
 
-  // shallowRef : le domaine renvoie toujours un nouveau panier, inutile de rendre chaque
-  // ligne réactive en profondeur.
+  // shallowRef : le domaine renvoie toujours un nouveau panier, la réactivité profonde est inutile.
   const cart = shallowRef<Cart>(emptyCart())
-  /** Dernier panier confirmé par le serveur : la cible d'un rollback. */
   let confirmed: Cart = emptyCart()
   const status = ref<CartStatus>('idle')
-  /** `false` tant que `localStorage` n'a pas été lu : on ne sait pas encore ce que contient le panier. */
+  /** `false` tant que `localStorage` n'a pas été lu (rendu serveur, avant l'hydratation). */
   const restored = ref(false)
-  /** Démo : fait échouer les prochaines confirmations. */
   const simulateFailure = ref(false)
   let latestRequest = 0
 
@@ -68,26 +67,22 @@ export const useCartStore = defineStore('cart', () => {
     }
   }
 
-  /** Reprend le panier sauvegardé comme état courant et confirmé. */
   function loadStoredCart(): void {
     const stored = readStoredCart()
     cart.value = stored
-    // Le navigateur est la source de vérité : ce qu'il a gardé fait référence.
     confirmed = stored
   }
 
   /**
-   * Restaure le panier depuis `localStorage`, puis suit les changements faits dans les autres
-   * onglets. Navigateur uniquement, après l'hydratation : le serveur ne voit pas ce stockage,
-   * et le premier rendu client doit égaler le HTML serveur.
+   * Navigateur uniquement, après l'hydratation : le serveur ne voit pas `localStorage`, et le
+   * premier rendu client doit égaler le HTML serveur. Suit aussi les autres onglets.
    */
   function restore(): void {
     loadStoredCart()
     restored.value = true
 
-    // `storage` n'est émis que dans les autres onglets. La dernière écriture l'emporte : un
-    // changement d'ailleurs remplace celui en cours ici, dont la réponse sera donc ignorée.
-    // `key` vaut null quand le stockage est vidé en entier.
+    // La dernière écriture l'emporte : une réponse en attente ici sera ignorée.
+    // `key` vaut null quand le stockage est vidé.
     window.addEventListener('storage', (event) => {
       if (event.key !== null && event.key !== CART_STORAGE_KEY) return
       latestRequest++
@@ -104,9 +99,10 @@ export const useCartStore = defineStore('cart', () => {
     restored,
     simulateFailure,
     restore,
+    quantityOf: (productId: number) => quantityOf(cart.value, productId),
     add: (product: Product) => commit(addProduct(cart.value, product)),
-    setQuantity: (productId: number, quantity: number) =>
-      commit(setLineQuantity(cart.value, productId, quantity)),
+    increment: (productId: number) => commit(incrementProduct(cart.value, productId)),
+    decrement: (productId: number) => commit(decrementProduct(cart.value, productId)),
     remove: (productId: number) => commit(removeLine(cart.value, productId)),
   }
 })

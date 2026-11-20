@@ -1,6 +1,10 @@
 import { describe, expect, it, vi } from 'vitest'
 import { UpstreamDataError, UpstreamUnavailableError } from '../errors.ts'
-import { fetchDummyJsonCatalogue, parseDummyJsonCatalogue } from './catalogue.ts'
+import {
+  dummyJsonCategoryName,
+  fetchDummyJsonCatalogue,
+  parseDummyJsonCatalogue,
+} from './catalogue.ts'
 
 const mascara = {
   id: 1,
@@ -12,6 +16,16 @@ const mascara = {
   category: 'beauty',
 }
 
+describe('dummyJsonCategoryName', () => {
+  it.each([
+    ['beauty', 'Beauty'],
+    ['mens-shirts', 'Mens shirts'],
+    ['home-decoration', 'Home decoration'],
+  ])('names the %s category %s', (slug, name) => {
+    expect(dummyJsonCategoryName(slug)).toBe(name)
+  })
+})
+
 describe('parseDummyJsonCatalogue', () => {
   it('maps DummyJSON products to our Product type', () => {
     expect(parseDummyJsonCatalogue({ products: [mascara] })).toEqual([
@@ -21,7 +35,7 @@ describe('parseDummyJsonCatalogue', () => {
         price: 9.99,
         rating: 2.56,
         image: mascara.thumbnail,
-        category: 'beauty',
+        category: { slug: 'beauty', name: 'Beauty' },
       },
     ])
   })

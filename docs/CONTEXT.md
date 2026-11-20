@@ -5,9 +5,12 @@ A product gallery where a visitor browses products and builds a cart. There is n
 ## Language
 
 **Product**
-An item of the catalogue as the app knows it: id, title, price, rating, image and category.
+An item of the catalogue as the app knows it: id, title, price, rating, image and Category.
 It is our own type, mapped from the upstream API (DummyJSON). The API's response shape never reaches the rest of the app.
 _Avoid_: item, article
+
+**Category**
+A group of Products. Its slug identifies it in URLs and filters; its name is what the visitor reads.
 
 **Cart**
 The visitor's Cart Lines.

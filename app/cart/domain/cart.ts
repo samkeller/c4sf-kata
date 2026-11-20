@@ -1,14 +1,13 @@
 import type { Cart, CartLine } from '#shared/cart.ts'
 import type { Product } from '#shared/product.ts'
 
-// Règles du panier : fonctions pures, qui renvoient un nouveau panier sans modifier l'ancien.
-// Le store garde ainsi le dernier panier confirmé intact pour un éventuel rollback.
+// Fonctions pures qui ne modifient jamais le panier reçu : le store garde ainsi intact le
+// dernier panier confirmé, cible d'un rollback.
 
 export function emptyCart(): Cart {
   return { lines: [] }
 }
 
-/** Ajoute une unité du produit : nouvelle ligne, ou quantité +1 si le produit y est déjà. */
 export function addProduct(cart: Cart, product: Product): Cart {
   const existing = cart.lines.find((line) => line.productId === product.id)
   if (existing) return setQuantity(cart, product.id, existing.quantity + 1)
@@ -23,7 +22,6 @@ export function addProduct(cart: Cart, product: Product): Cart {
   return { lines: [...cart.lines, line] }
 }
 
-/** Change la quantité d'une ligne : un entier, au moins 1 (retirer une ligne passe par `removeLine`). */
 export function setQuantity(cart: Cart, productId: number, quantity: number): Cart {
   const safeQuantity = Math.max(Math.trunc(quantity), 1)
   return {
@@ -35,6 +33,20 @@ export function setQuantity(cart: Cart, productId: number, quantity: number): Ca
 
 export function removeLine(cart: Cart, productId: number): Cart {
   return { lines: cart.lines.filter((line) => line.productId !== productId) }
+}
+
+export function quantityOf(cart: Cart, productId: number): number {
+  return cart.lines.find((line) => line.productId === productId)?.quantity ?? 0
+}
+
+export function incrementProduct(cart: Cart, productId: number): Cart {
+  return setQuantity(cart, productId, quantityOf(cart, productId) + 1)
+}
+
+/** Sous 1, la ligne disparaît : retirer le dernier article retire le produit du panier. */
+export function decrementProduct(cart: Cart, productId: number): Cart {
+  const quantity = quantityOf(cart, productId)
+  return quantity > 1 ? setQuantity(cart, productId, quantity - 1) : removeLine(cart, productId)
 }
 
 /**
@@ -49,7 +61,6 @@ export function cartTotal(cart: Cart): number {
   return cart.lines.reduce((total, line) => total + lineTotal(line), 0)
 }
 
-/** Nombre d'articles, quantités comprises (ce qu'affiche le badge). */
 export function itemCount(cart: Cart): number {
   return cart.lines.reduce((count, line) => count + line.quantity, 0)
 }

@@ -5,7 +5,17 @@ import { PAGE_SIZE, type ProductQuery } from '#shared/product-list.ts'
 import { listCategories, queryProducts } from './query-products.ts'
 
 function product(id: number, overrides: Partial<Product> = {}): Product {
-  return aProduct({ id, title: `Product ${id}`, price: id, category: 'misc', ...overrides })
+  return aProduct({
+    id,
+    title: `Product ${id}`,
+    price: id,
+    category: category('misc'),
+    ...overrides,
+  })
+}
+
+function category(slug: string) {
+  return { slug, name: slug }
 }
 
 function query(criteria: Partial<ProductQuery> = {}): ProductQuery {
@@ -44,7 +54,10 @@ describe('queryProducts', () => {
   })
 
   it('keeps only the requested category', () => {
-    const products = [product(1, { category: 'beauty' }), product(2, { category: 'groceries' })]
+    const products = [
+      product(1, { category: category('beauty') }),
+      product(2, { category: category('groceries') }),
+    ]
 
     expect(ids(queryProducts(products, query({ category: 'groceries' })).products)).toEqual([2])
   })
@@ -60,13 +73,13 @@ describe('queryProducts', () => {
     const phones = Array.from({ length: 30 }, (_, index) =>
       product(100 + index, {
         title: `Smartphone ${index}`,
-        category: 'smartphones',
+        category: category('smartphones'),
         price: index < 25 ? 100 + index : 500,
       }),
     )
     const lookalike = product(999, {
       title: 'Smartphone case',
-      category: 'accessories',
+      category: category('accessories'),
       price: 150,
     })
 
@@ -86,11 +99,11 @@ describe('queryProducts', () => {
 describe('listCategories', () => {
   it('lists each category once, sorted', () => {
     const products = [
-      product(1, { category: 'groceries' }),
-      product(2, { category: 'beauty' }),
-      product(3, { category: 'groceries' }),
+      product(1, { category: category('groceries') }),
+      product(2, { category: category('beauty') }),
+      product(3, { category: category('groceries') }),
     ]
 
-    expect(listCategories(products)).toEqual(['beauty', 'groceries'])
+    expect(listCategories(products).map((c) => c.slug)).toEqual(['beauty', 'groceries'])
   })
 })

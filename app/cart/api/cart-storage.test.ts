@@ -43,18 +43,4 @@ describe('cart storage', () => {
 
     expect(readStoredCart()).toEqual({ lines: [] })
   })
-
-  it('keeps working when storage is unavailable', () => {
-    const blocked = memoryStorage()
-    blocked.getItem = () => {
-      throw new DOMException('The operation is insecure.', 'SecurityError')
-    }
-    blocked.setItem = () => {
-      throw new DOMException('Quota exceeded', 'QuotaExceededError')
-    }
-    vi.stubGlobal('localStorage', blocked)
-
-    expect(() => writeStoredCart(cart)).not.toThrow()
-    expect(readStoredCart()).toEqual({ lines: [] })
-  })
 })

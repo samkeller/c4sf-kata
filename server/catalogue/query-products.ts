@@ -1,4 +1,4 @@
-import type { Product } from '#shared/product.ts'
+import type { Category, Product } from '#shared/product.ts'
 import { PAGE_SIZE, type ProductPage, type ProductQuery } from '#shared/product-list.ts'
 
 /**
@@ -16,7 +16,7 @@ export function queryProducts(products: readonly Product[], query: ProductQuery)
   const matches = products.filter(
     (product) =>
       (search === undefined || product.title.toLowerCase().includes(search)) &&
-      (query.category === undefined || product.category === query.category) &&
+      (query.category === undefined || product.category.slug === query.category) &&
       (query.minPrice === undefined || product.price >= query.minPrice) &&
       (query.maxPrice === undefined || product.price <= query.maxPrice),
   )
@@ -24,7 +24,7 @@ export function queryProducts(products: readonly Product[], query: ProductQuery)
   return { products: matches.slice(start, start + PAGE_SIZE), total: matches.length }
 }
 
-/** Catégories présentes dans le catalogue, triées, pour proposer le filtre. */
-export function listCategories(products: readonly Product[]): string[] {
-  return [...new Set(products.map((product) => product.category))].sort()
+export function listCategories(products: readonly Product[]): Category[] {
+  const bySlug = new Map(products.map((product) => [product.category.slug, product.category]))
+  return [...bySlug.values()].sort((a, b) => a.name.localeCompare(b.name))
 }

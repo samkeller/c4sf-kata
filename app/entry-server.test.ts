@@ -1,11 +1,15 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import type { Product } from '#shared/product.ts'
 import type { LoadProductList } from '#shared/product-list.ts'
 import { aProduct } from '#shared/test-fixtures.ts'
 import { render } from './entry-server.ts'
 
 function source(products: Product[]): LoadProductList {
-  return async () => ({ products, total: products.length, categories: ['beauty'] })
+  return async () => ({
+    products,
+    total: products.length,
+    categories: [{ slug: 'beauty', name: 'Beauty' }],
+  })
 }
 
 const failingSource: LoadProductList = async () => {
@@ -57,7 +61,28 @@ describe('render', () => {
   it('renders the empty state when no product matches', async () => {
     const { html } = await render('/', { loadProductList: source([]) })
 
-    expect(html).toContain('No products found.')
+    expect(html).toContain('No products match your search.')
+  })
+
+  it('renders a filtered URL with its criteria, read from the URL', async () => {
+    const loadProductList = vi.fn(source([aProduct({ title: 'Red Lipstick' })]))
+
+    const { html } = await render('/?q=red&category=beauty&minPrice=5&page=2', { loadProductList })
+
+    expect(loadProductList).toHaveBeenCalledWith(
+      { q: 'red', category: 'beauty', minPrice: 5, page: 2 },
+      expect.anything(),
+    )
+    expect(html).toContain('value="red"')
+    expect(html).toMatch(/<mark[^>]*>Red<\/mark>/)
+  })
+
+  it('renders an invalid URL instead of failing', async () => {
+    const loadProductList = vi.fn(source([aProduct()]))
+
+    await render('/?page=abc&q=red', { loadProductList })
+
+    expect(loadProductList).toHaveBeenCalledWith({ page: 1 }, expect.anything())
   })
 
   it('renders the lazy cart page without any cart content, which only the browser knows', async () => {

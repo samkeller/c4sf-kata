@@ -6,25 +6,26 @@ import CartEmpty from './CartEmpty.vue'
 import CartLineItem from './CartLineItem.vue'
 import CartSummary from './CartSummary.vue'
 
-/** Contenu du mini-panier : aperçu en lecture seule et accès à la page panier. */
 const emit = defineEmits<{ navigate: [] }>()
 
 const cart = useCartStore()
 </script>
 
 <template>
-  <div class="flex w-80 max-w-full flex-col gap-3">
-    <p class="font-semibold">Your cart</p>
+  <div class="flex w-80 max-w-full flex-col">
+    <p class="mb-3 font-semibold">Your cart</p>
     <CartEmpty v-if="cart.lines.length === 0" />
     <template v-else>
-      <ul class="-mx-1 flex max-h-72 flex-col gap-3 overflow-auto px-1">
-        <li v-for="line in cart.lines" :key="line.productId">
+      <ul class="max-h-72 overflow-auto">
+        <li v-for="(line, index) in cart.lines" :key="line.productId">
+          <Divider v-if="index > 0" />
           <CartLineItem :line="line" />
         </li>
       </ul>
-      <Divider class="my-0" />
+      <Divider />
       <CartSummary />
       <Button
+        class="mt-4"
         as="router-link"
         to="/cart"
         label="Go to cart"

@@ -1,13 +1,7 @@
 import type { Cart } from '#shared/cart.ts'
 import { HttpError } from '../../http-error.ts'
 
-/**
- * Envoie le panier complet à `PUT /api/cart` pour confirmation.
- *
- * @param simulateFailure demande au serveur d'échouer (démo du rollback).
- * @throws {HttpError} si le serveur refuse ou ne peut pas confirmer.
- * @throws {TypeError} si le réseau échoue (comportement de `fetch`).
- */
+/** @param simulateFailure demande au serveur d'échouer (démo du rollback). */
 export async function saveCart(cart: Cart, { simulateFailure }: { simulateFailure: boolean }) {
   const response = await fetch('/api/cart', {
     method: 'PUT',

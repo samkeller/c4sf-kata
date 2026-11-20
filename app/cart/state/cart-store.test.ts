@@ -83,12 +83,12 @@ describe('cart store', () => {
     const cart = useCartStore()
 
     const adding = cart.add(mascara)
-    const updating = cart.setQuantity(1, 3)
+    const updating = cart.increment(1)
     // La première réponse, périmée, échoue : elle ne doit pas annuler le changement suivant.
     first.reject(new Error('HTTP 503'))
     await adding
 
-    expect(cart.count).toBe(3)
+    expect(cart.count).toBe(2)
     expect(cart.status).toBe('syncing')
     expect(toastAdd).not.toHaveBeenCalled()
 

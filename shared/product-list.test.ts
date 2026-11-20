@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { productQuerySchema } from './product-list.ts'
+import { productQuerySchema, toProductSearchParams } from './product-list.ts'
 
 describe('productQuerySchema', () => {
   it('defaults to the first page without criteria', () => {
@@ -25,5 +25,19 @@ describe('productQuerySchema', () => {
     ['a repeated parameter', { q: ['a', 'b'] }],
   ])('rejects %s', (_case, input) => {
     expect(productQuerySchema.safeParse(input).success).toBe(false)
+  })
+})
+
+describe('toProductSearchParams', () => {
+  it('writes only the criteria that are set, as strings', () => {
+    expect(toProductSearchParams({ q: 'red', minPrice: 5, page: 2 })).toEqual({
+      q: 'red',
+      minPrice: '5',
+      page: '2',
+    })
+  })
+
+  it('leaves out the first page, so the default URL stays bare', () => {
+    expect(toProductSearchParams({ page: 1 })).toEqual({})
   })
 })
