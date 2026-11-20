@@ -2,7 +2,7 @@ import { Router } from 'express'
 import { z } from 'zod'
 import { productQuerySchema } from '../../shared/product-query.ts'
 import { listCategories, queryProducts } from '../catalogue/query-products.ts'
-import { fetchDummyJsonCatalogue } from '../dummyjson/catalogue.ts'
+import { getCatalogue } from '../catalogue/catalogue.ts'
 import { UpstreamDataError, UpstreamUnavailableError } from '../errors.ts'
 
 export const productsRouter = Router()
@@ -15,7 +15,7 @@ productsRouter.get('/', async (req, res) => {
   }
 
   try {
-    const catalogue = await fetchDummyJsonCatalogue()
+    const catalogue = await getCatalogue()
     res.json({ ...queryProducts(catalogue, query.data), categories: listCategories(catalogue) })
   } catch (error) {
     if (!(error instanceof UpstreamDataError || error instanceof UpstreamUnavailableError)) {

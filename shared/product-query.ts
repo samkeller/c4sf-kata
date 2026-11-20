@@ -11,7 +11,12 @@ export const PAGE_SIZE = 20
 export const productQuerySchema = z
   .object({
     // Une recherche vide équivaut à pas de recherche.
-    q: z.string().trim().max(100).transform((value) => value || undefined).optional(),
+    q: z
+      .string()
+      .trim()
+      .max(100)
+      .transform((value) => value || undefined)
+      .optional(),
     category: z.string().min(1).optional(),
     minPrice: z.coerce.number().nonnegative().optional(),
     maxPrice: z.coerce.number().nonnegative().optional(),
