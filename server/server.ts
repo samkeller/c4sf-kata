@@ -1,7 +1,10 @@
 import fs from 'node:fs/promises'
 import express from 'express'
+import helmet from 'helmet'
 import type { ViteDevServer } from 'vite'
 import type { RenderFn } from '../shared/ssr.ts'
+import { productsRouter } from './api/products.ts'
+import { DUMMYJSON_IMAGE_ORIGIN } from './dummyjson/config.ts'
 
 const isProduction = process.env.NODE_ENV === 'production'
 const port = Number(process.env.PORT) || 5176
@@ -11,6 +14,20 @@ const base = process.env.BASE ?? '/'
 const templateHtml = isProduction ? await fs.readFile('./dist/client/index.html', 'utf-8') : ''
 
 const app = express()
+
+app.use(
+  helmet({
+    contentSecurityPolicy: isProduction && {
+      directives: {
+        'img-src': ["'self'", 'data:', DUMMYJSON_IMAGE_ORIGIN],
+        // PrimeVue injecte son thème en balises <style> (dans le HTML SSR puis au runtime).
+        'style-src': ["'self'", "'unsafe-inline'"],
+        // La démo tourne en HTTP local ; en production, HTTPS relève du reverse proxy.
+        'upgrade-insecure-requests': null,
+      },
+    },
+  }),
+)
 
 let vite: ViteDevServer | undefined
 if (!isProduction) {
@@ -27,6 +44,9 @@ if (!isProduction) {
   app.use(compression())
   app.use(base, sirv('./dist/client', { extensions: [] }))
 }
+
+// Après `compression()` -> Avant le rendu SSR.
+app.use('/api/products', productsRouter)
 
 /**
  * En dev, Vite charge `entry-server.ts` à chaque requête pour profiter du HMR.
@@ -70,6 +90,7 @@ app.use('*all', async (req, res) => {
   }
 })
 
-app.listen(port, () => {
+app.listen(port, (error) => {
+  if (error) throw error
   console.log(`Server started at http://localhost:${port}`)
 })

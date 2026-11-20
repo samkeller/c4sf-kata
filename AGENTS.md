@@ -50,4 +50,4 @@ After a change that touches rendering, also run `npm run dev` (http://localhost:
 - the markup shows in view-source;
 - the browser console has no hydration warning.
 
-**Windows:** run commands from a working directory with an uppercase drive letter (`cd D:\...`). From `d:\`, Vitest loads twice and every suite fails with "failed to find the current suite".
+**Windows:** run commands from a working directory with an uppercase drive letter (`cd /D/...` in Git Bash). From `d:\`, Vitest loads twice and every suite fails with "failed to find the current suite".
