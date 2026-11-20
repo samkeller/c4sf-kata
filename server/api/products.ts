@@ -1,13 +1,22 @@
 import { Router } from 'express'
+import { z } from 'zod'
+import { productQuerySchema } from '../../shared/product-query.ts'
+import { listCategories, queryProducts } from '../catalogue/query-products.ts'
 import { fetchDummyJsonCatalogue } from '../dummyjson/catalogue.ts'
 import { UpstreamDataError, UpstreamUnavailableError } from '../errors.ts'
 
 export const productsRouter = Router()
 
-productsRouter.get('/', async (_req, res) => {
+productsRouter.get('/', async (req, res) => {
+  const query = productQuerySchema.safeParse(req.query)
+  if (!query.success) {
+    res.status(400).json({ error: z.prettifyError(query.error) })
+    return
+  }
+
   try {
-    const products = await fetchDummyJsonCatalogue()
-    res.json({ products, total: products.length })
+    const catalogue = await fetchDummyJsonCatalogue()
+    res.json({ ...queryProducts(catalogue, query.data), categories: listCategories(catalogue) })
   } catch (error) {
     if (!(error instanceof UpstreamDataError || error instanceof UpstreamUnavailableError)) {
       throw error
