@@ -27,7 +27,6 @@ Create a sub-folder when its first file arrives.
 - **Proportion:** add an abstraction or a dependency when a current requirement needs it.
 - **Tests:** Vitest, colocated as `*.test.ts`. Target behaviour (business rules, mappers, URL-state parsing), not coverage.
 - **Comments** are in French and explain why. JSDoc is for non-obvious contracts.
-- **Commits** follow Conventional Commits, one coherent change each.
 
 ## UI: PrimeVue 4
 
