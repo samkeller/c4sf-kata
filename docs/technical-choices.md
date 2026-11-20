@@ -17,6 +17,7 @@ The reasoning behind each choice. The short version is in the [README](../README
   - Stored data is checked with Zod on read: corrupt or outdated data gives an empty cart. The same schema validates the request body on the server.
   - The server never sees `localStorage`, so the cart is restored right after hydration and the server-rendered HTML always matches the first client render.
   - Tabs stay in sync through the `storage` event; the last write wins.
+  - Leaving or reloading the page cancels a pending confirmation. That is not a refusal, so it does not roll back: otherwise a reload right after a change would erase it. The end-to-end test reproduces this case.
   - `/cart` and the mini-cart content are lazy-loaded; they share their line and summary components.
 - **The server filters an in-memory catalogue.** DummyJSON has no price filter, and its search ignores categories. So the server loads the whole trimmed catalogue in one call, keeps it for 5 minutes, and applies search, category, price and pagination itself ([#8](https://github.com/samkeller/c4sf-kata/issues/8)).
   - This assumes a small catalogue: DummyJSON has 194 products. A real catalogue would move this work to a search engine or to the API.
