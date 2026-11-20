@@ -1,4 +1,5 @@
 import { renderToString } from 'vue/server-renderer'
+import { createMemoryHistory } from 'vue-router'
 import BaseStyle from '@primevue/core/base/style'
 import { dehydrate, defaultShouldDehydrateQuery, type DehydratedState } from '@tanstack/vue-query'
 import type { RenderFn } from '#shared/ssr.ts'
@@ -53,8 +54,14 @@ function serializeState(state: DehydratedState): string {
   return JSON.stringify(state).replaceAll('<', '\\u003c')
 }
 
-export const render: RenderFn = async (_url, { loadProductList }) => {
-  const { app, queryClient } = createApp(loadProductList)
+export const render: RenderFn = async (url, { loadProductList }) => {
+  const { app, queryClient, router } = createApp({
+    loadProductList,
+    history: createMemoryHistory(),
+  })
+  await router.push(url)
+  // Attend la résolution de la route, y compris le chargement d'un composant lazy (/cart).
+  await router.isReady()
 
   // PrimeVue injecte son CSS dans `beforeMount`, qui ne s'exécute pas côté serveur.
   // On relève donc les styles des composants rendus pour les mettre dans le <head>,

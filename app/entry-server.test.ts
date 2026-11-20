@@ -71,6 +71,14 @@ describe('render', () => {
     expect(html).toContain('No products found.')
   })
 
+  it('renders the lazy cart page without any cart content, which only the browser knows', async () => {
+    const { html } = await render('/cart', { loadProductList: source([product()]) })
+
+    expect(html).toContain('Your cart')
+    expect(html).not.toContain('Your cart is empty.')
+    expect(html).not.toContain('p-badge')
+  })
+
   it('inlines the theme and the styles of the PrimeVue components it rendered', async () => {
     const { head } = await render('/', { loadProductList: source([product()]) })
 
