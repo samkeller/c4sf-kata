@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import { z } from 'zod'
-import { productQuerySchema } from '../../shared/product-list.ts'
+import { productQuerySchema } from '#shared/product-list.ts'
 import { getProductList } from '../catalogue/catalogue.ts'
 import { UpstreamDataError, UpstreamUnavailableError } from '../errors.ts'
 

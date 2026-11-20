@@ -1,4 +1,4 @@
-import type { LoadProductList, ProductListResponse } from '../../../shared/product-list.ts'
+import type { LoadProductList, ProductListResponse } from '#shared/product-list.ts'
 import { HttpError } from '../../http-error.ts'
 
 /**

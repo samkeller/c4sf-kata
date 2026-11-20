@@ -1,4 +1,4 @@
-import type { ProductListResponse, ProductQuery } from '../../shared/product-list.ts'
+import type { ProductListResponse, ProductQuery } from '#shared/product-list.ts'
 import { fetchDummyJsonCatalogue } from '../dummyjson/catalogue.ts'
 import { createCatalogueCache } from './catalogue-cache.ts'
 import { listCategories, queryProducts } from './query-products.ts'

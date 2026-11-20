@@ -1,4 +1,4 @@
-import type { Product } from '../../shared/product.ts'
+import type { Product } from '#shared/product.ts'
 
 /**
  * Garde en mémoire le catalogue renvoyé par `load` pendant `ttlMs`.

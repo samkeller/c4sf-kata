@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import type { Product } from '../../shared/product.ts'
+import type { Product } from '#shared/product.ts'
 import { createCatalogueCache } from './catalogue-cache.ts'
 
 const TTL_MS = 5 * 60 * 1000

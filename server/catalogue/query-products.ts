@@ -1,5 +1,5 @@
-import type { Product } from '../../shared/product.ts'
-import { PAGE_SIZE, type ProductPage, type ProductQuery } from '../../shared/product-list.ts'
+import type { Product } from '#shared/product.ts'
+import { PAGE_SIZE, type ProductPage, type ProductQuery } from '#shared/product-list.ts'
 
 /**
  * Applique recherche, catégorie, prix min/max et pagination sur le catalogue en mémoire.

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import type { Product } from '../shared/product.ts'
-import type { LoadProductList } from '../shared/product-list.ts'
+import type { Product } from '#shared/product.ts'
+import type { LoadProductList } from '#shared/product-list.ts'
 import { render } from './entry-server.ts'
 
 function product(overrides: Partial<Product> = {}): Product {

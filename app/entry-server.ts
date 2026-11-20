@@ -1,7 +1,7 @@
 import { renderToString } from 'vue/server-renderer'
 import BaseStyle from '@primevue/core/base/style'
 import { dehydrate, defaultShouldDehydrateQuery, type DehydratedState } from '@tanstack/vue-query'
-import type { RenderFn } from '../shared/ssr.ts'
+import type { RenderFn } from '#shared/ssr.ts'
 import { createApp } from './main.ts'
 
 /** Méthodes des objets de style PrimeVue utilisées ici (absentes de leurs typages publics). */

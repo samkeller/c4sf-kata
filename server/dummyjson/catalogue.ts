@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import type { Product } from '../../shared/product.ts'
+import type { Product } from '#shared/product.ts'
 import { UpstreamDataError, UpstreamUnavailableError } from '../errors.ts'
 import { DUMMYJSON_API_URL, DUMMYJSON_TIMEOUT_MS } from './config.ts'
 

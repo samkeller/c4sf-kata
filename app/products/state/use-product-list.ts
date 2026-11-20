@@ -1,6 +1,6 @@
 import { computed, inject, onServerPrefetch, type InjectionKey } from 'vue'
 import { useQuery } from '@tanstack/vue-query'
-import type { LoadProductList, ProductQuery } from '../../../shared/product-list.ts'
+import type { LoadProductList, ProductQuery } from '#shared/product-list.ts'
 
 /** Source de la liste produits, fournie par `createApp()` selon le côté (serveur ou navigateur). */
 export const loadProductListKey: InjectionKey<LoadProductList> = Symbol('loadProductList')
@@ -11,7 +11,7 @@ export const loadProductListKey: InjectionKey<LoadProductList> = Symbol('loadPro
  * Pendant le rendu serveur, la requête est attendue avant de générer le HTML (`onServerPrefetch`) :
  * les produits sont dans la première réponse, et le cache déshydraté évite un second appel
  * dans le navigateur.
- * 
+ *
  * @link "use" =  Vue composable https://vuejs.org/guide/reusability/composables.html
  */
 export function useProductList() {

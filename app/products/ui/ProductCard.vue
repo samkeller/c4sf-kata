@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import Card from 'primevue/card'
 import Rating from 'primevue/rating'
-import type { Product } from '../../../shared/product.ts'
+import type { Product } from '#shared/product.ts'
 
 const props = defineProps<{
   product: Product

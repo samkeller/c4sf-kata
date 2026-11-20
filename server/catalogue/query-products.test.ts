@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import type { Product } from '../../shared/product.ts'
-import { PAGE_SIZE, type ProductQuery } from '../../shared/product-list.ts'
+import type { Product } from '#shared/product.ts'
+import { PAGE_SIZE, type ProductQuery } from '#shared/product-list.ts'
 import { listCategories, queryProducts } from './query-products.ts'
 
 function product(id: number, overrides: Partial<Product> = {}): Product {

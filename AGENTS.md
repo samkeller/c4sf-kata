@@ -9,7 +9,7 @@ E-shop product gallery with a cart: Vue 3 server-side rendering on Express, no m
 
 - `app/`: the Vue app, rendered on the server and hydrated in the browser. `main.ts` creates the app; `entry-server.ts` and `entry-client.ts` are the two entries.
 - `server/`: Express. Handles SSR, upstream API access and `/api/*`. Node 24 runs this TypeScript directly (type stripping), so use erasable syntax only and end relative imports in `.ts`.
-- `shared/`: code imported by both `app/` and `server/`.
+- `shared/`: code imported by both `app/` and `server/`. Import it as `#shared/<file>.ts`, a Node subpath import declared in `package.json` that Node, Vite and TypeScript resolve without extra config.
 
 Features live in `app/<feature>/` and follow simple MVC:
 
