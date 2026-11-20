@@ -74,7 +74,7 @@ describe('render', () => {
       expect.anything(),
     )
     expect(html).toContain('value="red"')
-    expect(html).toContain('Red Lipstick')
+    expect(html).toMatch(/<mark[^>]*>Red<\/mark>/)
   })
 
   it('renders an invalid URL instead of failing', async () => {

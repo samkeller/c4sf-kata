@@ -60,6 +60,7 @@ UI components never call `api/` directly; ESLint enforces this.
 - **Hand-rolled Vite SSR, no meta-framework**: product HTML is in the first response.
 - **TanStack Vue Query**, prefetched on the server and hydrated in the browser: no second fetch.
 - **The cart lives in the browser**: optimistic updates, rollback on failure, `localStorage`, synced across tabs.
+- **The URL holds the search and filters**: links can be shared, back and forward work, and the server renders a filtered URL directly.
 - **The server filters an in-memory catalogue**: fine for DummyJSON's 194 products.
 - **Zod at every boundary**: upstream API, request bodies, `localStorage`.
 - **PrimeVue 4 (MIT) and Tailwind**: ready-made components, no custom CSS.

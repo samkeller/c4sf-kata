@@ -12,17 +12,24 @@ Returns one page of products, the number of matching products and the list of ca
 ```json
 {
   "products": [
-    { "id": 1, "title": "…", "price": 9.99, "rating": 4.5, "image": "…", "category": "beauty" }
+    {
+      "id": 1,
+      "title": "…",
+      "price": 9.99,
+      "rating": 4.5,
+      "image": "…",
+      "category": { "slug": "beauty", "name": "Beauty" }
+    }
   ],
   "total": 194,
-  "categories": ["beauty", "…"]
+  "categories": [{ "slug": "beauty", "name": "Beauty" }, "…"]
 }
 ```
 
 | Parameter              | Effect                                         |
 | ---------------------- | ---------------------------------------------- |
 | `q`                    | Search in product titles                       |
-| `category`             | Keep one category                              |
+| `category`             | Keep one category, by its slug                 |
 | `minPrice`, `maxPrice` | Price range, bounds included                   |
 | `page`                 | Page number, 20 products per page, starts at 1 |
 

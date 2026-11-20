@@ -49,8 +49,9 @@ const status = computed(() => statusDisplay[cart.status])
     <div v-else class="grid items-start gap-6 lg:grid-cols-[1fr_20rem]">
       <Card>
         <template #content>
-          <ul class="divide-y divide-surface">
-            <li v-for="line in cart.lines" :key="line.productId" class="py-4 first:pt-0 last:pb-0">
+          <ul>
+            <li v-for="(line, index) in cart.lines" :key="line.productId">
+              <Divider v-if="index > 0" />
               <CartLineItem :line="line" editable />
             </li>
           </ul>
