@@ -1,13 +1,11 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import Button from 'primevue/button'
 import Card from 'primevue/card'
 import Rating from 'primevue/rating'
 import Tag from 'primevue/tag'
-import { useToast } from 'primevue/usetoast'
 import { toProductSearchParams } from '#shared/product-list.ts'
 import type { Product } from '#shared/product.ts'
-import { useCartStore } from '../../cart/state/cart-store.ts'
+import AddToCartButton from '../../cart/ui/AddToCartButton.vue'
 import { formatPrice } from '../../utils/format-price.ts'
 import { useProductQuery } from '../state/use-product-query.ts'
 
@@ -17,23 +15,11 @@ const props = defineProps<{
   priority: boolean
 }>()
 
-const cart = useCartStore()
-const toast = useToast()
 const { query } = useProductQuery()
 
 const categoryLink = computed(() => ({
   query: toProductSearchParams({ ...query.value, category: props.product.category.slug, page: 1 }),
 }))
-
-function addToCart() {
-  void cart.add(props.product)
-  toast.add({
-    severity: 'success',
-    summary: 'Added to cart',
-    detail: props.product.title,
-    life: 2000,
-  })
-}
 </script>
 
 <template>
@@ -76,7 +62,7 @@ function addToCart() {
       </div>
     </template>
     <template #footer>
-      <Button icon="pi pi-cart-plus" label="Add to cart" class="w-full" @click="addToCart" />
+      <AddToCartButton :product="product" />
     </template>
   </Card>
 </template>

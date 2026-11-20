@@ -8,10 +8,12 @@ import { saveCart } from '../api/save-cart.ts'
 import {
   addProduct,
   cartTotal,
+  decrementProduct,
   emptyCart,
+  incrementProduct,
   itemCount,
+  quantityOf,
   removeLine,
-  setQuantity as setLineQuantity,
 } from '../domain/cart.ts'
 
 export type CartStatus = 'idle' | 'syncing' | 'error'
@@ -97,9 +99,10 @@ export const useCartStore = defineStore('cart', () => {
     restored,
     simulateFailure,
     restore,
+    quantityOf: (productId: number) => quantityOf(cart.value, productId),
     add: (product: Product) => commit(addProduct(cart.value, product)),
-    setQuantity: (productId: number, quantity: number) =>
-      commit(setLineQuantity(cart.value, productId, quantity)),
+    increment: (productId: number) => commit(incrementProduct(cart.value, productId)),
+    decrement: (productId: number) => commit(decrementProduct(cart.value, productId)),
     remove: (productId: number) => commit(removeLine(cart.value, productId)),
   }
 })

@@ -35,6 +35,20 @@ export function removeLine(cart: Cart, productId: number): Cart {
   return { lines: cart.lines.filter((line) => line.productId !== productId) }
 }
 
+export function quantityOf(cart: Cart, productId: number): number {
+  return cart.lines.find((line) => line.productId === productId)?.quantity ?? 0
+}
+
+export function incrementProduct(cart: Cart, productId: number): Cart {
+  return setQuantity(cart, productId, quantityOf(cart, productId) + 1)
+}
+
+/** Sous 1, la ligne disparaît : retirer le dernier article retire le produit du panier. */
+export function decrementProduct(cart: Cart, productId: number): Cart {
+  const quantity = quantityOf(cart, productId)
+  return quantity > 1 ? setQuantity(cart, productId, quantity - 1) : removeLine(cart, productId)
+}
+
 /**
  * Total d'une ligne. Les prix restent des nombres flottants, arrondis à l'affichage :
  * suffisant ici, puisque rien n'est payé. Un vrai paiement calculerait en centimes côté serveur.

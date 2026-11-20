@@ -1,7 +1,17 @@
 import { describe, expect, it } from 'vitest'
 import type { Cart } from '#shared/cart.ts'
 import { aProduct } from '#shared/test-fixtures.ts'
-import { addProduct, cartTotal, itemCount, lineTotal, removeLine, setQuantity } from './cart.ts'
+import {
+  addProduct,
+  cartTotal,
+  decrementProduct,
+  incrementProduct,
+  itemCount,
+  lineTotal,
+  quantityOf,
+  removeLine,
+  setQuantity,
+} from './cart.ts'
 
 const mascara = aProduct()
 const lipstick = aProduct({ id: 4, title: 'Red Lipstick', price: 12.99 })
@@ -53,6 +63,19 @@ describe('setQuantity', () => {
     [2.7, 2],
   ])('brings %s back to %s', (quantity, expected) => {
     expect(setQuantity(cart, 1, quantity).lines[0]?.quantity).toBe(expected)
+  })
+})
+
+describe('incrementProduct and decrementProduct', () => {
+  const cart = setQuantity(addProduct(empty, mascara), 1, 2)
+
+  it('adds or takes one unit', () => {
+    expect(quantityOf(incrementProduct(cart, 1), 1)).toBe(3)
+    expect(quantityOf(decrementProduct(cart, 1), 1)).toBe(1)
+  })
+
+  it('removes the line when its last unit is taken', () => {
+    expect(decrementProduct(addProduct(empty, mascara), 1).lines).toEqual([])
   })
 })
 
